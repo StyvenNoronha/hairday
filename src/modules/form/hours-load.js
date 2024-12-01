@@ -13,6 +13,7 @@ export function hoursLoad({ date, dailySchedules }) {
     dayjs(schedule.when).format("HH:mm")
   );
 
+
   const opening = openingHours.map((hour) => {
     //Recupera somente a hora
     const [scheduleHour] = hour.split(":");
@@ -21,7 +22,9 @@ export function hoursLoad({ date, dailySchedules }) {
     const isHourPast = dayjs(date).add(scheduleHour, "hour").isBefore(dayjs());
 
 
-    const available = !unavailableHours.includes(hours) && !isHourPast
+    const available = !unavailableHours.includes(hour) && !isHourPast
+
+
 
     return {
       hour,
