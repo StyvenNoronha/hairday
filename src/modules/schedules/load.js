@@ -14,5 +14,5 @@ export async function schedulesDay(){
     //exibe os agendamentos
     schedulesShow({dailySchedules})
     //console.log(dailySchedules)
-    hoursLoad({date})
+    hoursLoad({date, dailySchedules})
 }

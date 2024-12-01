@@ -1,53 +1,61 @@
-import dayjs from "dayjs"
-import {openingHours} from "../../utils/opening-hours.js"
-import { hoursClick } from "./hours-click.js"
-const hours = document.getElementById("hours")
-export function hoursLoad({date}){
-    const opening = openingHours.map((hour)=>{
-        //limpa a lista de horários
-        hours.innerHTML = ""
-        //Recupera somente a hora
-        const [scheduleHour] = hour.split(":")
+import dayjs from "dayjs";
+import { openingHours } from "../../utils/opening-hours.js";
+import { hoursClick } from "./hours-click.js";
+const hours = document.getElementById("hours");
 
 
-        //adiciona a hora na date e verificar se esta no passado
-        const isHourPast = dayjs(date).add(scheduleHour, "hour").isAfter(dayjs())
+export function hoursLoad({ date, dailySchedules }) {
+  //limpa a lista de horários
+  hours.innerHTML = "";
 
-        return{
-            hour,
-            available: isHourPast
-        }
-        
-    })
+  //obtém a lista de todos os horários ocupados
+  const unavailableHours = dailySchedules.map((schedule) =>
+    dayjs(schedule.when).format("HH:mm")
+  );
+
+  const opening = openingHours.map((hour) => {
+    //Recupera somente a hora
+    const [scheduleHour] = hour.split(":");
+
+    //adiciona a hora na date e verificar se esta no passado
+    const isHourPast = dayjs(date).add(scheduleHour, "hour").isBefore(dayjs());
 
 
-    //renderizar os horários
-    opening.forEach(({hour, available})=>{
-        const li = document.createElement("li")
+    const available = !unavailableHours.includes(hours) && !isHourPast
 
-        li.classList.add("hour")
-        li.classList.add(available ? "hour-available" : "hour-unavailable")
+    return {
+      hour,
+      available
+    };
+  });
 
-        li.textContent = hour
+  //renderizar os horários
+  opening.forEach(({ hour, available }) => {
+    const li = document.createElement("li");
 
-        if(hour === "9:00"){
-            hourHeaderAdd("Manhã")
-        }else if (hour === "13:00"){
-            hourHeaderAdd("Tarde")
-        }else if(hour === "18:00"){
-            hourHeaderAdd("Noite")
-        }
+    li.classList.add("hour");
+    li.classList.add(available ? "hour-available" : "hour-unavailable");
 
-        //add o evento de clique nos horários disponível
-        hours.append(li)
-    })
-    hoursClick()
+    li.textContent = hour;
+
+    if (hour === "9:00") {
+      hourHeaderAdd("Manhã");
+    } else if (hour === "13:00") {
+      hourHeaderAdd("Tarde");
+    } else if (hour === "18:00") {
+      hourHeaderAdd("Noite");
+    }
+
+    //add o evento de clique nos horários disponível
+    hours.append(li);
+  });
+  hoursClick();
 }
 
-function hourHeaderAdd(title){
-    const header = document.createElement("li")
-    header.classList.add("hour-period")
-    header.textContent = title
+function hourHeaderAdd(title) {
+  const header = document.createElement("li");
+  header.classList.add("hour-period");
+  header.textContent = title;
 
-    hours.append(header)
+  hours.append(header);
 }
